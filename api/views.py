@@ -37,10 +37,6 @@ class ProductModelViewSet(viewsets.ModelViewSet):
         product_to_change = Product.objects.get(pk=kwargs['pk'])  # изменяемый товар
         entered_quantity = int(request.data['quantity'])  # введенное количество товара
 
-        # # Попытка ввести отрицательное количество товара
-        # if entered_quantity < 0:
-        #     raise serializers.ValidationError('Недостаточно товара на складе')
-
         # Поставщик, не может получать товар
         if request.user.position == 'provider' and entered_quantity < product_to_change.quantity:
             raise serializers.ValidationError('Текущий пользователь - Поставщик, не может получать товар')
@@ -58,13 +54,11 @@ class ProductModelViewSet(viewsets.ModelViewSet):
 
         return super().update(request, *args, **kwargs)
 
-
     def destroy(self, request, *args, **kwargs):
         # Удалять товар может только суперюзер
         if not request.user.is_superuser:
             raise serializers.ValidationError('Нет прав на удаление товара')
         return super().destroy(request, *args, **kwargs)
-
 
     def create(self, request, *args, **kwargs):
         # Создавать товар может только суперюзер
